@@ -6,65 +6,119 @@
 namespace fs = std::filesystem;
 using namespace std;
 
-class directory
+
+class Path
 {
 private:
-	string path;
+	string InputPath;
+	string TextToFind;
+public:
+	int InPath()
+	{
+		cout << "Insert path to file or directory" << endl;
+		cin >> this->InputPath;
+		if (fs::exists(this->InputPath))
+		{
+			string rPath = InputPath.substr(InputPath.length() - 4, InputPath.length());
+			if (rPath == ".txt")
+			{
+				return 0;
+			}
+			else
+			{
+				return 1;
+			}
+		}
+		else
+		{	
+			cout << "Path nit found";
+			return -100;
+		}
+	}
 
-	bool PathExists;
+	string RetPath()
+	{
+		return this->InputPath;
+	}
 
+	void InputText()
+	{	
+		cout << "Insert text to be found" << endl;
+		cin >> TextToFind;
+	}
+};
+
+
+class directory: public Path
+{
+private:
 	int NumOfFiles;
 	int NumOftextFiles;
 	int NumOfFolders;
 public:
-	void InsertPath()
+	void GetPath()
 	{
-		cin >> this->path;
-		if (fs::exists(this->path))
-		{	
-			this->PathExists = true;
-			int i = 0;
-			for (auto& entry : fs::directory_iterator(path))
-				(
+		int i = 0;
+		for (auto& entry : fs::directory_iterator(Path::RetPath()))
+			(
 
-					cout << entry.is_directory() << endl
+				cout << entry.is_directory() << endl
 
-					);
-		}
-		else
-		{	
-			this->PathExists = false;
-			cout << "Path did not found";
-		}
-	};
+			);
+	}
 };
 
-class File
+class File: public Path
 {
 private:
 	string name;
-	int characters;
-	bool txtFile;
-	string FindText;
+	int NumOfOcc;
 public:
-	void InsertText()
-	{
-		cin >> this->FindText;
+	string FileName(string InputPath)
+	{	
+		int i = 0;
+		string sep="\\";
+		size_t occur = InputPath.find(sep);
+		while (occur != string::npos)
+		{	
+			occur = InputPath.find(sep, occur + 1);
+			if (occur != string::npos)
+			{	
+				i = occur;
+			}
+			this->name = InputPath.substr(i+1, InputPath.length());
+
+		}
+
+		return this->name;
 	}
+
+
+	
 };
 
 
 int main()
 {	
-	directory D1;
-	File f1;
-    cout << "Insert path to file or folder\n"; 
-	cout << "Path:";
-	D1.InsertPath();
+	Path InitPath;
+	InitPath.InputText();
 
-	cout << "\nInsert text to be found\n";
-	cout << "Text:";
-	f1.InsertText();
+	int PathValid = InitPath.InPath();
+
+	if (PathValid == 1)
+	{
+		directory Dir1;
+		Dir1.GetPath();
+	}
+	else if (PathValid == 0)
+	{
+		File f1;
+		cout<<f1.FileName(InitPath.RetPath());
+	}
+	else
+	{
+		cout << "Path not found";
+	}
 
 
 
