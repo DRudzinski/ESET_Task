@@ -87,10 +87,10 @@ private:
 	int NumOfFolders; // Numbers of other directory
 
 public:
-	queue <string> FilesQueue; //Store queue in directory with path to txt files
+	queue <string> FilesQueue; //Store paths to txt files
+	queue <string> DirQueue; //Store paths to directorys
 
-
-	//Method to explore initial path
+	//Method to explore path and search for txt files
 	void FindTxtFiles(string Path)
 	{
 		//Looking for txt files
@@ -105,6 +105,22 @@ public:
 
 
 	}
+
+	//Method to expolore path and looking for directories
+	void FindDir(string Path)
+	{
+		//Looking for Dir
+		for (auto& entry : fs::directory_iterator(Path))
+		{	
+			if (entry.is_directory())
+			{
+				this->DirQueue.push(entry.path().u8string());
+			}
+		}
+
+	}
+
+
 };
 //----------------------------------------------
 //------------End of Directory Class------------
@@ -369,8 +385,25 @@ int main()
 
 		if (PathValid == 1)
 		{
-			directory Dir1;
-			Dir1.FindTxtFiles(InitPath.RetPath());
+			directory Dir1; //Initialize Directory object
+			string CurrentPath = InitPath.RetPath();
+			
+			//Loop searching for all txt files
+			do
+			{
+				Dir1.FindDir(CurrentPath); // searching directory in current path
+				Dir1.FindTxtFiles(CurrentPath); //searching txt files in current path
+				
+				Dir1.DirQueue.pop();
+				if (Dir1.DirQueue.empty() == false)
+				{
+					CurrentPath = Dir1.DirQueue.front();
+				}
+
+
+			} while (Dir1.DirQueue.empty()==false);
+
+			//Loop to find match in files which path exists in Dir.FilesQueue
 			int QueueSize = Dir1.FilesQueue.size();
 			for (int i = 0; i < QueueSize; i++)
 			{
