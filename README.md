@@ -1,7 +1,7 @@
 The project has been made base on ESET CHALLENGE TASK under link:
 https://join.eset.com/en/challenges/c-developer
 
-Necessery input:
+Necessary input:
 - Path to txt file or directory, eg:
   C:\ESET\file.txt
   C:\ESET
