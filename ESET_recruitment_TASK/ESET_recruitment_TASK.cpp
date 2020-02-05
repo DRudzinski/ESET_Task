@@ -39,7 +39,7 @@ public:
 		}
 		else
 		{	
-			cout << "Path nit found";
+			cout << "Path not found";
 			return -100; //if path not exists
 		}
 	}
@@ -79,13 +79,8 @@ public:
 //----------------End of Path Class------------
 
 //Class for one directory
-class directory: public Path
+class directory
 {
-private:
-	int NumOfFiles; //Numbers of files in directory
-	int NumOftextFiles; // Numbers of txt files in directory
-	int NumOfFolders; // Numbers of other directory
-
 public:
 	queue <string> FilesQueue; //Store paths to txt files
 	queue <string> DirQueue; //Store paths to directorys
@@ -128,11 +123,10 @@ public:
 
 
 //Class for one file
-class File: public Path
+class File
 {
 private:
 	string name; //Name of file
-	int NumOfOcc; //Number of occurence of text typed in Path class
 public:
 	//Method set file name base on path
 	string FileName(string InputPath)
@@ -213,7 +207,7 @@ public:
 						offset = tab_poz +2;
 					}
 
-					cout << tempSuffix << endl;
+					cout << tempSuffix;
 					NextLineCout = false;
 				}//Display missing characters end
 				//--------------------------------------------
@@ -338,11 +332,11 @@ public:
 					//Final display
 					if (NextLineCout == false)
 					{
-						cout << this->name << "(" << charNum + occur << ")" << preffix << "..." << suffix << endl; //If all preffix and suffix has been set 
+						cout << endl << this->name << "(" << charNum + occur << ")" << preffix << "..." << suffix; //If all preffix and suffix has been set 
 					}
 					else
 					{
-						cout << this->name << "(" << charNum + occur << ")" << preffix << "..." << suffix; //If suffix require haracters from next line
+						cout<<endl << this->name << "(" << charNum + occur << ")" << preffix << "..." << suffix; //If suffix require haracters from next line
 					}
 					
 
@@ -379,11 +373,11 @@ public:
 int main()
 {	
 	Path InitPath;
-	if (InitPath.InputText() == true)
+	if (InitPath.InputText() == true)//If path is valid
 	{
-		int PathValid = InitPath.InPath(); //check what type of path has been typed: 0 - txt file , 1 - directory 100 - path doesnt exists
+		int PathValid = InitPath.InPath(); //check what type of path has been inserted: 0 - txt file , 1 - directory 100 - path doesnt exists
 
-		if (PathValid == 1)
+		if (PathValid == 1)//if path leads to Directory
 		{
 			directory Dir1; //Initialize Directory object
 			string CurrentPath = InitPath.RetPath();
@@ -414,7 +408,7 @@ int main()
 				Dir1.FilesQueue.pop();
 			}
 		}
-		else if (PathValid == 0)
+		else if (PathValid == 0)//if path leads to txt file
 		{
 			File f1;
 			f1.FileName(InitPath.RetPath());
@@ -425,10 +419,64 @@ int main()
 			cout << "Path not found";
 		}
 	}
-	
-
-
-
-
+	cout << endl << endl;
+	system("pause");
 }
+
+/*
+------------------------
+Multithread solution
+------------------------
+
+#include <thread>
+#include <deque>
+
+
+//Loop to explore all txt files from the front of the list
+void ExploreLoopHead(int QueueSize,File f,directory Dir1, string txtFind)
+{
+	for (int i = 0; i < QueueSize; i++)
+	{
+		cout << f.FileName(Dir1.FilesDeQue.front()) << endl;;
+		f.ExplorFile(Dir1.FilesDeQue.front(), txtFind);
+
+		Dir1.FilesQueue.pop_front();
+
+	}
+}
+//Loop to explore all txt files from the back of the list
+void ExploreLoopBack(int QueueSize, File f, directory Dir1, string txtFind)
+{
+	for (int i = QueueSize; i > 0; i--)
+	{
+		cout << f.FileName(Dir1.FilesDeQue.back()) << endl;;
+		f.ExplorFile(Dir1.FilesDeQue.back(), txtFind);
+
+		Dir1.FilesQueue.pop_back();
+
+	}
+
+
+//IN MAIN:
+int QueueSize = Dir1.FilesQueue.size();
+if (QueueSize % 2 == 0)
+{
+	thread t1(ExploreLoopHead, QueueSize/2, f, Dir1, InitPath.RetTxT());
+	thread t2(ExploreLoopBack, QueueSize/2, f, Dir1, InitPath.RetTxT());
+	t1.join();
+	t2.join();
+}
+else
+{
+	thread t1(ExploreLoopHead, ((QueueSize / 2)+1), f, Dir1, InitPath.RetTxT());
+	thread t2(ExploreLoopBack, QueueSize / 2, f, Dir1, InitPath.RetTxT());
+	t1.join();
+	t2.join();
+}
+------------------------
+		END
+------------------------
+*/
+
+
 
